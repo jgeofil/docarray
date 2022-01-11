@@ -17,7 +17,7 @@ def parse_proto(pb_msg: 'DocumentProto') -> 'Document':
     fields = {}
     for (field, value) in pb_msg.ListFields():
         f_name = field.name
-        if f_name == 'chunks' or f_name == 'matches':
+        if f_name in ['chunks', 'matches']:
             fields[f_name] = [Document.from_protobuf(d) for d in value]
         elif isinstance(value, NdArrayProto):
             fields[f_name] = read_ndarray(value)
@@ -25,12 +25,10 @@ def parse_proto(pb_msg: 'DocumentProto') -> 'Document':
             fields[f_name] = MessageToDict(value, preserving_proto_field_name=True)
         elif f_name == 'location':
             fields[f_name] = list(value)
-        elif f_name == 'scores' or f_name == 'evaluations':
-            fields[f_name] = {}
-            for k, v in value.items():
-                fields[f_name][k] = NamedScore(
+        elif f_name in ['scores', 'evaluations']:
+            fields[f_name] = {k: NamedScore(
                     {ff.name: vv for (ff, vv) in v.ListFields()}
-                )
+                ) for k, v in value.items()}
         else:
             fields[f_name] = value
     return Document(**fields)
@@ -56,9 +54,7 @@ def flush_proto(doc: 'Document') -> 'DocumentProto':
                         setattr(getattr(pb_msg, key)[kk], ff, getattr(vv, ff))
             elif key == 'location':
                 pb_msg.location.extend(value)
-            elif key == 'content':
-                pass  # intentionally ignore `content` field as it is just a proxy
-            else:
+            elif key != 'content':
                 # other simple fields
                 setattr(pb_msg, key, value)
         except RecursionError as ex:

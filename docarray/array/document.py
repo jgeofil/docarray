@@ -51,12 +51,11 @@ class DocumentArray(AllMixins, MutableSequence[Document]):
             else:
                 self._data = list(docs)
                 self._rebuild_id2offset()
-        else:
-            if isinstance(docs, Document):
-                if copy:
-                    self.append(Document(docs, copy=True))
-                else:
-                    self.append(docs)
+        elif isinstance(docs, Document):
+            if copy:
+                self.append(Document(docs, copy=True))
+            else:
+                self.append(docs)
 
     @property
     def _id2offset(self) -> Dict[str, int]:

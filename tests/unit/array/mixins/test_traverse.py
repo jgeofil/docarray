@@ -353,7 +353,7 @@ def test_flatten(da):
     daf = da.flatten()
     assert len(daf) == 600
     assert isinstance(daf, DocumentArray)
-    assert len(set(d.id for d in daf)) == 600
+    assert len({d.id for d in daf}) == 600
 
     # flattened DA can not be flattened again
     daf = daf.flatten()

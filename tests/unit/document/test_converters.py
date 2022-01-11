@@ -11,8 +11,7 @@ cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_video_convert_pipe(pytestconfig, tmpdir):
-    num_d = 0
-    fname = str(tmpdir / f'tmp{num_d}.mp4')
+    fname = str(tmpdir / f'tmp0.mp4')
     d = Document(uri=os.path.join(cur_dir, 'toydata/mov_bbb.mp4'))
     d.load_uri_to_video_blob()
     d.save_video_blob_to_file(fname)

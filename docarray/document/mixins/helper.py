@@ -26,14 +26,9 @@ def _uri_to_buffer(uri: str) -> bytes:
 
 def _get_file_context(file):
     if hasattr(file, 'write'):
-        file_ctx = nullcontext(file)
+        return nullcontext(file)
     else:
-        if __windows__:
-            file_ctx = open(file, 'wb', newline='')
-        else:
-            file_ctx = open(file, 'wb')
-
-    return file_ctx
+        return open(file, 'wb', newline='') if __windows__ else open(file, 'wb')
 
 
 def _to_datauri(
@@ -63,10 +58,7 @@ def _to_datauri(
     else:
         from urllib.parse import quote_from_bytes, quote
 
-        if binary:
-            encoded_data = quote_from_bytes(data)
-        else:
-            encoded_data = quote(data)
+        encoded_data = quote_from_bytes(data) if binary else quote(data)
     parts.extend([',', encoded_data])
     return ''.join(parts)
 

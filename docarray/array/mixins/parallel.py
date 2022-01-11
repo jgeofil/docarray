@@ -81,8 +81,7 @@ class ParallelMixin:
         if _is_lambda_or_local_function(func) and backend == 'process':
             func = _globalize_lambda_function(func)
         with _get_pool(backend, num_worker) as p:
-            for x in p.imap(func, self):
-                yield x
+            yield from p.imap(func, self)
 
     @overload
     def apply_batch(
@@ -164,8 +163,7 @@ class ParallelMixin:
         if _is_lambda_or_local_function(func) and backend == 'process':
             func = _globalize_lambda_function(func)
         with _get_pool(backend, num_worker) as p:
-            for x in p.imap(func, self.batch(batch_size=batch_size, shuffle=shuffle)):
-                yield x
+            yield from p.imap(func, self.batch(batch_size=batch_size, shuffle=shuffle))
 
 
 def _get_pool(backend, num_worker):

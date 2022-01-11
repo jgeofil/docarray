@@ -26,7 +26,7 @@ def filepath(tmpdir):
 
 @pytest.fixture(scope='function')
 def dataset_configs():
-    config = {
+    return {
         'adversarial': {
             'dataset_path': 'adversarial_qa',
             'name': 'adversarialQA',
@@ -38,7 +38,6 @@ def dataset_configs():
             'split': 'train+test',
         },
     }
-    return config
 
 
 def test_input_lines_with_filepath(filepath):
@@ -91,8 +90,6 @@ def test_input_csv_from_strings(da):
 def test_input_lines_with_empty_filepath_and_lines():
     with pytest.raises(ValueError):
         lines = from_lines(lines=None, filepath=None)
-        for _ in lines:
-            pass
 
 
 def test_input_lines_with_jsonlines_docs():
@@ -255,7 +252,7 @@ def test_input_huggingface_datasets_with_filter_fields(dataset_configs):
     )
     assert isinstance(result[0], Document)
     assert result[0].text
-    assert not 'title' in result[0].tags
+    assert 'title' not in result[0].tags
 
 
 def test_input_huggingface_datasets_with_no_split(dataset_configs):
@@ -264,8 +261,6 @@ def test_input_huggingface_datasets_with_no_split(dataset_configs):
             dataset_configs['adversarial']['dataset_path'],
             name=dataset_configs['adversarial']['name'],
         )
-        for _ in result:
-            pass
 
 
 def test_input_huggingface_datasets_with_filter_fields_and_no_resolver(dataset_configs):
@@ -275,8 +270,6 @@ def test_input_huggingface_datasets_with_filter_fields_and_no_resolver(dataset_c
             name=dataset_configs['adversarial']['name'],
             filter_fields=True,
         )
-        for _ in result:
-            pass
 
 
 @pytest.mark.parametrize(

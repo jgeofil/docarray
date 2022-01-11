@@ -59,8 +59,7 @@ class ContentPropertyMixin:
         :return: a :class:`ArrayType` of blobs
         """
         if self and self[0].content_type == 'blob':
-            if self:
-                return unravel(self, 'blob')
+            return unravel(self, 'blob')
 
     @blobs.setter
     def blobs(self, value: 'ArrayType'):
@@ -85,8 +84,7 @@ class ContentPropertyMixin:
         :return: a list of texts
         """
         if self and self[0].content_type == 'text':
-            if self:
-                return [d.text for d in self]
+            return [d.text for d in self]
 
     @texts.setter
     def texts(self, value: Sequence[str]):
@@ -111,8 +109,7 @@ class ContentPropertyMixin:
         :return: a list of buffers
         """
         if self and self[0].content_type == 'buffer':
-            if self:
-                return [d.buffer for d in self]
+            return [d.buffer for d in self]
 
     @buffers.setter
     def buffers(self, value: List[bytes]):

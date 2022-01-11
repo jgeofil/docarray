@@ -16,11 +16,7 @@ class GetAttributesMixin:
 
         ret = []
         for k in fields:
-            if '__' in k:
-                value = dunder_get(self, k)
-            else:
-                value = getattr(self, k)
-
+            value = dunder_get(self, k) if '__' in k else getattr(self, k)
             ret.append(value)
 
         # unboxing if args is single

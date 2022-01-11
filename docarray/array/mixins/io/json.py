@@ -17,11 +17,7 @@ class JsonIOMixin:
 
         :param file: File or filename to which the data is saved.
         """
-        if hasattr(file, 'write'):
-            file_ctx = nullcontext(file)
-        else:
-            file_ctx = open(file, 'w')
-
+        file_ctx = nullcontext(file) if hasattr(file, 'write') else open(file, 'w')
         with file_ctx as fp:
             for d in self:
                 json.dump(d.to_dict(), fp)

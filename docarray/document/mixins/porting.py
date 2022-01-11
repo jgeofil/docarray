@@ -28,15 +28,14 @@ class PortingMixin:
         return cls.from_protobuf(pb_msg)
 
     def to_dict(self, strict: bool = True) -> Dict[str, Any]:
-        if strict:
-            from google.protobuf.json_format import MessageToDict
-
-            return MessageToDict(
-                self.to_protobuf(),
-                preserving_proto_field_name=True,
-            )
-        else:
+        if not strict:
             return dataclasses.asdict(self._data)
+        from google.protobuf.json_format import MessageToDict
+
+        return MessageToDict(
+            self.to_protobuf(),
+            preserving_proto_field_name=True,
+        )
 
     def to_bytes(
         self, protocol: str = 'pickle', compress: Optional[str] = None

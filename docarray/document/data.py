@@ -58,7 +58,7 @@ class DocumentData:
 
     def __setattr__(self, key, value):
         if value is not None:
-            if key == 'text' or key == 'blob' or key == 'buffer':
+            if key in ['text', 'blob', 'buffer']:
                 # enable mutual exclusivity for content field
                 dv = default_values.get(key)
                 if type(value) != type(dv) or value != dv:
@@ -125,28 +125,29 @@ class DocumentData:
         return tuple(r)
 
     def _set_default_value_if_none(self, key):
-        if getattr(self, key) is None:
-            v = default_values.get(key, None)
-            if v is not None:
-                if v == 'DocumentArray':
-                    from .. import DocumentArray
+        if getattr(self, key) is not None:
+            return
+        v = default_values.get(key, None)
+        if v is not None:
+            if v == 'DocumentArray':
+                from .. import DocumentArray
 
-                    setattr(self, key, DocumentArray())
-                elif v == 'ChunkArray':
-                    from ..array.chunk import ChunkArray
+                setattr(self, key, DocumentArray())
+            elif v == 'ChunkArray':
+                from ..array.chunk import ChunkArray
 
-                    setattr(
-                        self, key, ChunkArray(None, reference_doc=self._reference_doc)
-                    )
-                elif v == 'MatchArray':
-                    from ..array.match import MatchArray
+                setattr(
+                    self, key, ChunkArray(None, reference_doc=self._reference_doc)
+                )
+            elif v == 'MatchArray':
+                from ..array.match import MatchArray
 
-                    setattr(
-                        self, key, MatchArray(None, reference_doc=self._reference_doc)
-                    )
-                elif v == 'Dict[str, NamedScore]':
-                    from ..score import NamedScore
+                setattr(
+                    self, key, MatchArray(None, reference_doc=self._reference_doc)
+                )
+            elif v == 'Dict[str, NamedScore]':
+                from ..score import NamedScore
 
-                    setattr(self, key, defaultdict(NamedScore))
-                else:
-                    setattr(self, key, v() if callable(v) else v)
+                setattr(self, key, defaultdict(NamedScore))
+            else:
+                setattr(self, key, v() if callable(v) else v)

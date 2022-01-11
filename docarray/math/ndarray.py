@@ -96,18 +96,16 @@ def get_array_type(array: 'ArrayType') -> Tuple[str, bool]:
     if 'numpy' in module_tags:
         return 'numpy', False
 
-    if 'jina' in module_tags:
-        if class_name == 'NdArray':
-            return 'jina', False  # sparse or not is irrelevant
+    if 'jina' in module_tags and class_name == 'NdArray':
+        return 'jina', False  # sparse or not is irrelevant
 
-    if 'docarray_pb2' in module_tags:
-        if class_name == 'NdArrayProto':
-            return 'jina_proto', False  # sparse or not is irrelevant
+    if 'docarray_pb2' in module_tags and class_name == 'NdArrayProto':
+        return 'jina_proto', False  # sparse or not is irrelevant
 
     if 'tensorflow' in module_tags:
         if class_name == 'SparseTensor':
             return 'tensorflow', True
-        if class_name == 'Tensor' or class_name == 'EagerTensor':
+        if class_name in ['Tensor', 'EagerTensor']:
             return 'tensorflow', False
 
     if 'torch' in module_tags and class_name == 'Tensor':

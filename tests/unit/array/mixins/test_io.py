@@ -35,7 +35,7 @@ def test_da_csv_write(flatten_tags, tmp_path, da):
     tmpfile = os.path.join(tmp_path, 'test.csv')
     da.save_csv(tmpfile, flatten_tags)
     with open(tmpfile) as fp:
-        assert len([v for v in fp]) == len(da) + 1
+        assert len(list(fp)) == len(da) + 1
 
 
 @pytest.mark.parametrize('da', [DocumentArray])

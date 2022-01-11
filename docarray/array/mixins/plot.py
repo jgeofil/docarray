@@ -35,7 +35,7 @@ class PlotMixin:
         is_homo = len(attr_counter) == 1
         table.add_row('Homogenous Documents', str(is_homo))
 
-        all_attrs_names = set(v for k in all_attrs for v in k)
+        all_attrs_names = {v for k in all_attrs for v in k}
         _nested_in = []
         if 'chunks' in all_attrs_names:
             _nested_in.append('chunks')
@@ -50,10 +50,7 @@ class PlotMixin:
             table.add_row('Common Attributes', str(list(attr_counter.items())[0][0]))
         else:
             for _a, _n in attr_counter.most_common():
-                if _n <= 1:
-                    _doc_text = f'{_n} Document has'
-                else:
-                    _doc_text = f'{_n} Documents have'
+                _doc_text = f'{_n} Document has' if _n <= 1 else f'{_n} Documents have'
                 if len(_a) == 1:
                     _text = f'{_doc_text} one attribute'
                 elif len(_a) == 0:
@@ -82,7 +79,7 @@ class PlotMixin:
                 _a = set(_a)
             except:
                 pass  # intentional ignore as some fields are not hashable
-            _set_type_a = set(type(_aa).__name__ for _aa in _a)
+            _set_type_a = {type(_aa).__name__ for _aa in _a}
             attr_table.add_row(
                 _a_name,
                 str(tuple(_set_type_a)),
@@ -266,7 +263,7 @@ class PlotMixin:
         if img_size < min_size:
             # image is too small, recompute the size
             img_size = min_size
-            img_per_row = int(canvas_size / img_size)
+            img_per_row = canvas_size // img_size
 
         max_num_img = img_per_row ** 2
         sprite_img = np.zeros(

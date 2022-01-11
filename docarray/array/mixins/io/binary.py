@@ -32,11 +32,13 @@ class BinaryIOMixin:
         :return: a DocumentArray object
         """
 
-        if isinstance(file, io.BufferedReader):
+        if isinstance(file, (io.BufferedReader, bytes)):
             file_ctx = nullcontext(file)
-        elif isinstance(file, bytes):
-            file_ctx = nullcontext(file)
-        elif os.path.exists(file):
+        elif (
+            not isinstance(file, io.BufferedReader)
+            and not isinstance(file, bytes)
+            and os.path.exists(file)
+        ):
             file_ctx = open(file, 'rb')
         else:
             raise ValueError(f'unsupported input {file!r}')
@@ -49,15 +51,15 @@ class BinaryIOMixin:
                 d = decompress_bytes(d, algorithm=compress)
                 compress = None
 
-            if protocol == 'protobuf-array':
+            if protocol == 'pickle-array':
+                return pickle.loads(d)
+            elif protocol == 'protobuf-array':
                 from ....proto.docarray_pb2 import DocumentArrayProto
 
                 dap = DocumentArrayProto()
                 dap.ParseFromString(d)
 
                 return cls.from_protobuf(dap)
-            elif protocol == 'pickle-array':
-                return pickle.loads(d)
             else:
                 _len = len(random_uuid().bytes)
                 _binary_delimiter = d[:_len]  # first get delimiter
@@ -104,11 +106,7 @@ class BinaryIOMixin:
         if isinstance(file, io.BufferedWriter):
             file_ctx = nullcontext(file)
         else:
-            if __windows__:
-                file_ctx = open(file, 'wb', newline='')
-            else:
-                file_ctx = open(file, 'wb')
-
+            file_ctx = open(file, 'wb', newline='') if __windows__ else open(file, 'wb')
         self.to_bytes(protocol=protocol, compress=compress, _file_ctx=file_ctx)
 
     def to_bytes(

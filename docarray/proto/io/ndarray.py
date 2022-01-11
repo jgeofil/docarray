@@ -38,47 +38,43 @@ def read_ndarray(pb_msg: 'NdArrayProto') -> 'ArrayType':
             from torch import sparse_coo_tensor
 
             return sparse_coo_tensor(idx, val, shape)
-    else:
-        if framework in {'numpy', 'torch', 'paddle', 'tensorflow'}:
-            x = _get_dense_array(pb_msg.dense)
-            return _to_framework_array(x, framework)
+    elif framework in {'numpy', 'torch', 'paddle', 'tensorflow'}:
+        x = _get_dense_array(pb_msg.dense)
+        return _to_framework_array(x, framework)
 
 
 def flush_ndarray(pb_msg: 'NdArrayProto', value: 'ArrayType'):
     framework, is_sparse = get_array_type(value)
 
-    if framework == 'jina':
+    if framework != 'jina' and framework != 'jina_proto' and is_sparse:
+        if framework == 'scipy':
+            pb_msg.parameters['sparse_format'] = value.getformat()
+            _set_scipy_sparse(pb_msg, value)
+        if framework == 'tensorflow':
+            _set_tf_sparse(pb_msg, value)
+        if framework == 'torch':
+            _set_torch_sparse(pb_msg, value)
+    elif framework not in ['jina', 'jina_proto']:
+        if framework == 'numpy':
+            pb_msg.cls_name = 'numpy'
+            _set_dense_array(pb_msg.dense, value)
+        if framework == 'python':
+            pb_msg.cls_name = 'numpy'
+            _set_dense_array(pb_msg.dense, np.array(value))
+        if framework == 'tensorflow':
+            pb_msg.cls_name = 'tensorflow'
+            _set_dense_array(pb_msg.dense, value.numpy())
+        if framework == 'torch':
+            pb_msg.cls_name = 'torch'
+            _set_dense_array(pb_msg.dense, value.detach().cpu().numpy())
+        if framework == 'paddle':
+            pb_msg.cls_name = 'paddle'
+            _set_dense_array(pb_msg.dense, value.numpy())
+
+    else:
         # it is Jina's NdArray, simply copy it
         pb_msg.cls_name = 'numpy'
         pb_msg.CopyFrom(value)
-    elif framework == 'jina_proto':
-        pb_msg.cls_name = 'numpy'
-        pb_msg.CopyFrom(value)
-    else:
-        if is_sparse:
-            if framework == 'scipy':
-                pb_msg.parameters['sparse_format'] = value.getformat()
-                _set_scipy_sparse(pb_msg, value)
-            if framework == 'tensorflow':
-                _set_tf_sparse(pb_msg, value)
-            if framework == 'torch':
-                _set_torch_sparse(pb_msg, value)
-        else:
-            if framework == 'numpy':
-                pb_msg.cls_name = 'numpy'
-                _set_dense_array(pb_msg.dense, value)
-            if framework == 'python':
-                pb_msg.cls_name = 'numpy'
-                _set_dense_array(pb_msg.dense, np.array(value))
-            if framework == 'tensorflow':
-                pb_msg.cls_name = 'tensorflow'
-                _set_dense_array(pb_msg.dense, value.numpy())
-            if framework == 'torch':
-                pb_msg.cls_name = 'torch'
-                _set_dense_array(pb_msg.dense, value.detach().cpu().numpy())
-            if framework == 'paddle':
-                pb_msg.cls_name = 'paddle'
-                _set_dense_array(pb_msg.dense, value.numpy())
 
 
 def _set_dense_array(pb_msg, value):

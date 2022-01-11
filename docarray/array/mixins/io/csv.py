@@ -22,10 +22,7 @@ class CsvIOMixin:
         :param file: File or filename to which the data is saved.
         :param kwargs: extra kwargs will be passed to :meth:`numpy.savetxt`.
         """
-        if hasattr(file, 'write'):
-            file_ctx = nullcontext(file)
-        else:
-            file_ctx = open(file, 'w')
+        file_ctx = nullcontext(file) if hasattr(file, 'write') else open(file, 'w')
         np.savetxt(file_ctx, self.embeddings, **kwargs)
 
     def save_csv(
@@ -46,16 +43,10 @@ class CsvIOMixin:
             predefined dialects in your system, or could be a :class:`csv.Dialect` class that groups specific formatting
             parameters together.
         """
-        if hasattr(file, 'write'):
-            file_ctx = nullcontext(file)
-        else:
-            file_ctx = open(file, 'w')
-
+        file_ctx = nullcontext(file) if hasattr(file, 'write') else open(file, 'w')
         with file_ctx as fp:
             if flatten_tags and self[0].tags:
-                keys = list(self[0].non_empty_fields) + list(
-                    f'tag__{k}' for k in self[0].tags
-                )
+                keys = (list(self[0].non_empty_fields) + [f'tag__{k}' for k in self[0].tags])
                 keys.remove('tags')
             else:
                 flatten_tags = False

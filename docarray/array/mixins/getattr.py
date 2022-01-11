@@ -43,7 +43,7 @@ class GetAttributeMixin:
             return self.blobs
         if b_index is None and e_index is not None:
             return self.embeddings
-        if b_index is not None and e_index is not None:
+        if b_index is not None:
             return (
                 [self.embeddings, self.blobs]
                 if b_index > e_index

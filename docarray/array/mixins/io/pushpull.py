@@ -131,25 +131,24 @@ class PushPullMixin:
 
 
 def _get_progressbar(show_progress):
-    if show_progress:
-        from rich.progress import (
-            BarColumn,
-            DownloadColumn,
-            Progress,
-            TimeRemainingColumn,
-            TransferSpeedColumn,
-        )
-
-        return Progress(
-            BarColumn(bar_width=None),
-            "[progress.percentage]{task.percentage:>3.1f}%",
-            "•",
-            DownloadColumn(),
-            "•",
-            TransferSpeedColumn(),
-            "•",
-            TimeRemainingColumn(),
-            transient=True,
-        )
-    else:
+    if not show_progress:
         return nullcontext()
+    from rich.progress import (
+        BarColumn,
+        DownloadColumn,
+        Progress,
+        TimeRemainingColumn,
+        TransferSpeedColumn,
+    )
+
+    return Progress(
+        BarColumn(bar_width=None),
+        "[progress.percentage]{task.percentage:>3.1f}%",
+        "•",
+        DownloadColumn(),
+        "•",
+        TransferSpeedColumn(),
+        "•",
+        TimeRemainingColumn(),
+        transient=True,
+    )

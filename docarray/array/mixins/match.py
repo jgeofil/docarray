@@ -118,11 +118,7 @@ class MatchMixin:
                 # Note, when match self with other, or both of them share the same Document
                 # we might have recursive matches .
                 # checkout https://github.com/jina-ai/jina/issues/3034
-                if only_id:
-                    d = Document(id=rhv[_id].id)
-                else:
-                    d = rhv[int(_id)]  # type: Document
-
+                d = Document(id=rhv[_id].id) if only_id else rhv[int(_id)]
                 if d.id in lhv:
                     d = Document(
                         d, copy=True

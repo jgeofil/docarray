@@ -8,7 +8,7 @@ import numpy as np
 
 def _check_k(k):
     if k is not None and k < 1:
-        raise ValueError(f'`k` must be >=1 or `None`')
+        raise ValueError('`k` must be >=1 or `None`')
 
 
 def r_precision(binary_relevance: List[int], **kwargs) -> float:

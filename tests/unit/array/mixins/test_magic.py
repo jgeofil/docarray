@@ -12,9 +12,7 @@ def da_and_dam():
 
 @pytest.mark.parametrize('da', da_and_dam())
 def test_iter_len_bool(da):
-    j = 0
-    for _ in da:
-        j += 1
+    j = sum(1 for _ in da)
     assert j == N
     assert j == len(da)
     assert da
